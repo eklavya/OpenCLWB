@@ -8,6 +8,8 @@ scalaVersion := "2.12.6"
 
 resolvers += Resolver.mavenLocal
 
+scalacOptions += "-g:vars"
+
 libraryDependencies ++= Seq(
   "com.aparapi" % "aparapi" % "1.10.0-SNAPSHOT",
   "com.aparapi" % "aparapi-jni" % "1.2.0"
