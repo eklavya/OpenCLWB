@@ -17,5 +17,6 @@ fork in run := true
 
 javaOptions in run ++= Seq(
   "-Xms8G",
-  "-Xmx8G"
+  "-Xmx8G",
+  "-Dcom.aparapi.enableShowGeneratedOpenCL=true"
 )
