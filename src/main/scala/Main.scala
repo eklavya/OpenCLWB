@@ -1,8 +1,29 @@
 import com.aparapi.internal.kernel.KernelManager
 
 import scala.util.Random
+import java.{util => ju}
+
+import com.aparapi.{Kernel, Range}
+import com.aparapi.device.Device
 
 object Main {
+  val bestDevice: Device = KernelManager.instance.bestDevice
+  val range: Range = Range.create(bestDevice.getMaxWorkItemSize()(0), bestDevice.getMaxWorkGroupSize)
+
+  def testKernel(inA: Array[Float], inB: Array[Float]): Array[Float] = {
+    val result = new Array[Float](inA.length)
+    val kernel = new Kernel() {
+      override def run() {
+        val i = getGlobalId()
+        result(i) = ((inA(i) + inB(i)) / (inA(i) / inB(i))) * ((inA(i) - inB(i)) / (inA(i) * inB(i))) -
+          ((inB(i) - inA(i)) * (inB(i) + inA(i))) * ((inB(i) - inA(i)) / (inB(i) * inA(i)))
+      }
+    }
+
+    kernel.execute(range)
+    result
+  }
+
   def main(args: Array[String]): Unit = {
     val bestDevice = KernelManager.instance().bestDevice()
     println(s"Detected best opencl device is a ${bestDevice.getType}")
@@ -13,7 +34,8 @@ object Main {
 
     val openCLTime = (0 to 10).map { _ =>
       val beforeOCL = System.nanoTime()
-      OCLKernel.testKernel(a, b).length
+//      OCLKernel.testKernel(a, b).length
+      testKernel(a, b).length
       val afterOCL = System.nanoTime()
       afterOCL - beforeOCL
     }
